@@ -1,0 +1,485 @@
+{#
+  Hand-drawn landscape scenes, in the spirit of painted animation backgrounds.
+  All artwork is original SVG. Colours come from CSS variables (see .scene--* in style.css),
+  and all motion is CSS (switched off for visitors who prefer reduced motion).
+
+  Usage:  {% from "partials/scenes.njk" import scene %}
+          {{ scene("meadow", "hero", tall=true) }}
+  Scenes: meadow, sunlight, dusk, network, fungus, evolution, pollen, greenhouse, pines
+#}
+
+{# ---------- shared building blocks ---------- #}
+
+{% macro defs(id, top) %}
+<defs>
+  <linearGradient id="{{id}}-sky" gradientUnits="userSpaceOnUse" x1="0" y1="{{ top }}" x2="0" y2="400">
+    <stop offset="0" style="stop-color:var(--sky-1)"/>
+    <stop offset="0.6" style="stop-color:var(--sky-2)"/>
+    <stop offset="1" style="stop-color:var(--sky-3)"/>
+  </linearGradient>
+  <radialGradient id="{{id}}-glow">
+    <stop offset="0" style="stop-color:var(--sun);stop-opacity:1"/>
+    <stop offset="0.3" style="stop-color:var(--sun);stop-opacity:0.6"/>
+    <stop offset="1" style="stop-color:var(--sun);stop-opacity:0"/>
+  </radialGradient>
+  <radialGradient id="{{id}}-ff">
+    <stop offset="0" style="stop-color:#fffbd6;stop-opacity:1"/>
+    <stop offset="0.25" style="stop-color:#fff0a0;stop-opacity:0.7"/>
+    <stop offset="1" style="stop-color:#ffe98a;stop-opacity:0"/>
+  </radialGradient>
+  <filter id="{{id}}-wc" x="-2%" y="-10%" width="104%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</defs>
+{% endmacro %}
+
+{% macro sun(id, x, y, r=46, glow=190) %}
+<circle cx="{{x}}" cy="{{y}}" r="{{glow}}" fill="url(#{{id}}-glow)"/>
+<circle cx="{{x}}" cy="{{y}}" r="{{r}}" fill="var(--sun-core)" opacity="0.92"/>
+{% endmacro %}
+
+{% macro cloudBig(x, y, s=1, d="90s", dx="50px") %}
+<g transform="translate({{x}} {{y}}) scale({{s}})"><g class="drift" style="--d:{{d}};--dx:{{dx}}">
+  <g fill="var(--cloud-shade)">
+    <circle cx="-70" cy="-12" r="44"/><circle cx="0" cy="-42" r="70"/><circle cx="82" cy="-92" r="94"/>
+    <circle cx="190" cy="-150" r="118"/><circle cx="300" cy="-108" r="98"/><circle cx="390" cy="-58" r="78"/>
+    <circle cx="458" cy="-18" r="52"/><ellipse cx="195" cy="-12" rx="290" ry="36"/>
+  </g>
+  <g fill="var(--cloud)">
+    <circle cx="-74" cy="-22" r="36"/><circle cx="-6" cy="-54" r="62"/><circle cx="76" cy="-106" r="84"/>
+    <circle cx="184" cy="-166" r="106"/><circle cx="292" cy="-124" r="88"/><circle cx="380" cy="-72" r="68"/>
+    <circle cx="448" cy="-30" r="44"/>
+  </g>
+  <g fill="#fff" opacity="0.75"><circle cx="150" cy="-222" r="42"/><circle cx="58" cy="-150" r="30"/><circle cx="262" cy="-176" r="34"/><circle cx="360" cy="-104" r="22"/></g>
+</g></g>
+{% endmacro %}
+
+{% macro cloud(x, y, s=1, d="60s", dx="40px") %}
+<g transform="translate({{x}} {{y}}) scale({{s}})"><g class="drift" style="--d:{{d}};--dx:{{dx}}">
+  <g fill="var(--cloud-shade)"><circle cx="0" cy="0" r="26"/><circle cx="38" cy="-16" r="34"/><circle cx="80" cy="-6" r="30"/><circle cx="112" cy="6" r="20"/><ellipse cx="56" cy="12" rx="74" ry="12"/></g>
+  <g fill="var(--cloud)"><circle cx="-2" cy="-5" r="22"/><circle cx="35" cy="-22" r="30"/><circle cx="76" cy="-12" r="26"/><circle cx="108" cy="2" r="16"/></g>
+</g></g>
+{% endmacro %}
+
+{% macro hillFar(id) %}
+<path filter="url(#{{id}}-wc)" fill="var(--hill-far)" d="M-20,300 C120,262 260,250 380,268 C520,290 610,236 760,232 C900,228 1010,268 1220,250 L1220,460 L-20,460 Z"/>
+{% endmacro %}
+
+{% macro hillMid(id) %}
+<path filter="url(#{{id}}-wc)" fill="var(--hill-mid)" d="M-20,338 C140,300 300,306 430,322 C580,340 690,292 840,296 C980,300 1080,330 1220,312 L1220,460 L-20,460 Z"/>
+<path fill="none" stroke="var(--hill-light)" stroke-width="3" stroke-linecap="round" opacity="0.55" d="M40,326 C160,300 300,306 420,320 M640,304 C720,292 800,292 900,300"/>
+{% endmacro %}
+
+{% macro hillNear(id) %}
+<path filter="url(#{{id}}-wc)" fill="var(--hill-near)" d="M-20,392 C160,360 330,372 520,384 C700,396 860,360 1020,366 C1100,369 1160,380 1220,376 L1220,460 L-20,460 Z"/>
+{% endmacro %}
+
+{% macro tuft(x, y, s=1, d="5s", delay="0s") %}
+<g transform="translate({{x}} {{y}}) scale({{s}})"><g class="sway" style="--d:{{d}};--delay:{{delay}}">
+  <path d="M0,0 C1,-8 -1,-14 -5,-20 M3,0 C3,-10 5,-16 9,-22 M6,0 C7,-6 10,-10 15,-12 M-3,0 C-4,-5 -8,-9 -12,-10" fill="none" stroke="var(--grass)" stroke-width="2.2" stroke-linecap="round"/>
+</g></g>
+{% endmacro %}
+
+{% macro tufts(list) %}
+{% for t in list %}{{ tuft(t[0], t[1], t[2] or 1, (4 + loop.index % 3) + "s", "-" + (loop.index * 0.7) + "s") }}{% endfor %}
+{% endmacro %}
+
+{% macro seed(x, y, dx, dy, d, delay, s=1) %}
+<g transform="translate({{x}} {{y}}) scale({{s}})"><g class="float" style="--dx:{{dx}}px;--dy:{{dy}}px;--d:{{d}}s;--delay:{{delay}}s">
+  <g stroke="var(--seed)" stroke-width="1.1" stroke-linecap="round" fill="none">
+    <path d="M0,0 L0,9"/><path d="M0,0 L-6,-4 M0,0 L-3.5,-7 M0,0 L0,-8 M0,0 L3.5,-7 M0,0 L6,-4"/>
+  </g>
+  <circle cx="0" cy="10" r="1.7" fill="var(--seed-core)"/>
+</g></g>
+{% endmacro %}
+
+{% macro mote(x, y, dx, dy, d, delay, r=2.5, fill="var(--mote)") %}
+<g transform="translate({{x}} {{y}})"><circle class="float" style="--dx:{{dx}}px;--dy:{{dy}}px;--d:{{d}}s;--delay:{{delay}}s" r="{{r}}" fill="{{fill}}"/></g>
+{% endmacro %}
+
+{% macro sparkle(x, y, s, d, delay) %}
+<g transform="translate({{x}} {{y}}) scale({{s}})"><g class="rise" style="--d:{{d}}s;--delay:{{delay}}s;--dy:-70px">
+  <path class="twinkle" style="--d:1.6s;--delay:{{delay}}s" d="M0,-8 L1.8,-1.8 L8,0 L1.8,1.8 L0,8 L-1.8,1.8 L-8,0 L-1.8,-1.8 Z" fill="var(--spark)"/>
+</g></g>
+{% endmacro %}
+
+{% macro firefly(id, x, y, dx, dy, d, tw, delay) %}
+<g transform="translate({{x}} {{y}})"><g class="wander" style="--dx:{{dx}}px;--dy:{{dy}}px;--d:{{d}}s;--delay:-{{delay}}s">
+  <g class="twinkle" style="--d:{{tw}}s;--delay:-{{delay}}s"><circle r="11" fill="url(#{{id}}-ff)"/><circle r="2" fill="#fffbe6"/></g>
+</g></g>
+{% endmacro %}
+
+{% macro tree(x, y, s=1, blossom=false) %}
+<g transform="translate({{x}} {{y}}) scale({{s}})">
+  <path fill="var(--trunk)" d="M-9,2 C-6,-25 -12,-55 -5,-88 L-14,-112 L-8,-114 L0,-96 L8,-122 L14,-119 L6,-86 C10,-55 6,-25 10,2 Z"/>
+  <g class="sway-slow">
+    <g fill="var(--leaf-dark)">
+      <circle cx="-62" cy="-118" r="40"/><circle cx="-20" cy="-150" r="52"/><circle cx="38" cy="-150" r="50"/>
+      <circle cx="72" cy="-112" r="38"/><circle cx="0" cy="-104" r="46"/><circle cx="-40" cy="-90" r="30"/><circle cx="44" cy="-88" r="30"/>
+    </g>
+    <g fill="var(--leaf-light)">
+      <circle cx="-56" cy="-128" r="30"/><circle cx="-18" cy="-162" r="40"/><circle cx="34" cy="-162" r="38"/>
+      <circle cx="66" cy="-124" r="26"/><circle cx="2" cy="-122" r="34"/>
+    </g>
+    <g fill="var(--leaf-hi)" opacity="0.85"><circle cx="-26" cy="-182" r="18"/><circle cx="22" cy="-184" r="16"/><circle cx="-62" cy="-144" r="12"/><circle cx="60" cy="-140" r="10"/></g>
+    {% if blossom %}
+    <g fill="var(--blossom)">
+      {% for p in [[-60,-120],[-30,-170],[10,-180],[50,-150],[70,-118],[-10,-130],[30,-120],[-45,-150],[0,-155],[45,-170],[-70,-100],[20,-95],[-20,-100],[60,-100],[-50,-180]] %}
+      <circle cx="{{p[0]}}" cy="{{p[1]}}" r="{{ 5 + loop.index % 3 }}"/>
+      {% endfor %}
+    </g>
+    {% endif %}
+  </g>
+</g>
+{% endmacro %}
+
+{% macro cottage(x, y, s=1, lit=false) %}
+<g transform="translate({{x}} {{y}}) scale({{s}})">
+  <g fill="var(--smoke)">
+    <circle class="puff" style="--delay:0s" cx="19" cy="-72" r="6"/>
+    <circle class="puff" style="--delay:-2s" cx="19" cy="-72" r="6"/>
+    <circle class="puff" style="--delay:-4s" cx="19" cy="-72" r="6"/>
+  </g>
+  <rect x="14" y="-68" width="10" height="22" rx="1.5" fill="var(--chimney)"/>
+  <rect x="-30" y="-36" width="60" height="38" rx="2" fill="var(--wall)"/>
+  <path d="M-42,-33 Q-22,-50 0,-66 Q22,-50 42,-33 Z" fill="var(--roof)"/>
+  <path d="M-42,-33 Q-22,-50 0,-66" fill="none" stroke="var(--roof-hi)" stroke-width="3" stroke-linecap="round"/>
+  <rect x="-6" y="-20" width="12" height="22" rx="6" fill="var(--door)"/>
+  <rect x="-23" y="-27" width="11" height="10" rx="2" fill="{{ '#ffe7a3' if lit else 'var(--window)' }}"/>
+  <rect x="12" y="-27" width="11" height="10" rx="2" fill="{{ '#ffe7a3' if lit else 'var(--window)' }}"/>
+</g>
+{% endmacro %}
+
+{% macro leaf(x, y, rot=0, s=1, spots=false) %}
+<g transform="translate({{x}} {{y}}) rotate({{rot}}) scale({{s}})"><g class="sway-slow" style="--d:7s">
+  <path d="M0,0 C30,-70 150,-110 262,-92 C206,-10 92,32 0,0 Z" fill="var(--leaf-light)"/>
+  <path d="M0,0 C30,-70 150,-110 262,-92 C190,-80 90,-50 0,0 Z" fill="var(--leaf-hi)" opacity="0.55"/>
+  <path d="M0,0 C80,-40 170,-72 262,-92" fill="none" stroke="var(--leaf-dark)" stroke-width="3" stroke-linecap="round"/>
+  <g fill="none" stroke="var(--leaf-dark)" stroke-width="1.6" stroke-linecap="round" opacity="0.7">
+    <path d="M60,-28 C70,-52 84,-66 98,-74"/><path d="M110,-50 C124,-72 140,-84 156,-90"/><path d="M160,-66 C174,-84 190,-92 206,-96"/>
+    <path d="M70,-30 C92,-20 112,-16 132,-16"/><path d="M124,-54 C146,-44 166,-42 188,-44"/>
+  </g>
+  {% if spots %}
+  <g>
+    {% for p in [[70,-16,9],[118,-34,12],[160,-40,8],[200,-62,10],[92,-48,6],[140,-12,7]] %}
+    <circle cx="{{p[0]}}" cy="{{p[1]}}" r="{{p[2] + 4}}" fill="var(--halo)" opacity="0.8"/>
+    <circle cx="{{p[0]}}" cy="{{p[1]}}" r="{{p[2]}}" fill="var(--spot)"/>
+    <circle cx="{{p[0] - 1}}" cy="{{p[1] - 1}}" r="{{p[2] * 0.45}}" fill="var(--spot-core)"/>
+    {% endfor %}
+  </g>
+  {% endif %}
+</g></g>
+{% endmacro %}
+
+{% macro mushroom(x, y, s=1, cap="var(--cap)") %}
+<g transform="translate({{x}} {{y}}) scale({{s}})">
+  <path d="M-7,2 C-6,-14 -5,-22 -6,-30 L6,-30 C5,-22 6,-14 7,2 Z" fill="var(--stem)"/>
+  <path d="M-27,-27 C-25,-52 25,-52 27,-27 C10,-23 -10,-23 -27,-27 Z" fill="{{cap}}"/>
+  <path d="M-20,-36 C-14,-46 0,-49 10,-46" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity="0.45"/>
+  <circle cx="-10" cy="-37" r="3.6" fill="#fff" opacity="0.9"/><circle cx="7" cy="-41" r="2.8" fill="#fff" opacity="0.9"/><circle cx="16" cy="-32" r="2.2" fill="#fff" opacity="0.9"/>
+</g>
+{% endmacro %}
+
+{% macro fern(x, y, s=1) %}
+<g transform="translate({{x}} {{y}}) scale({{s}})">
+  {% for rot in [-34, -12, 10, 30] %}
+  <g transform="rotate({{rot}})"><g class="sway" style="--d:{{ 5 + loop.index }}s;--delay:-{{ loop.index }}s">
+    <path d="M0,0 L0,-118" stroke="var(--leaf-dark)" stroke-width="2.4" stroke-linecap="round"/>
+    <g fill="var(--fern)">
+      {% for i in range(0, 10) %}{% set yy = -14 - i * 11 %}{% set w = 15 - i * 1.3 %}
+      <ellipse cx="{{ -w }}" cy="{{ yy }}" rx="{{ w }}" ry="3.6" transform="rotate(-24 0 {{ yy }})"/>
+      <ellipse cx="{{ w }}" cy="{{ yy }}" rx="{{ w }}" ry="3.6" transform="rotate(24 0 {{ yy }})"/>
+      {% endfor %}
+    </g>
+  </g></g>
+  {% endfor %}
+  <path d="M6,0 C12,-30 26,-36 30,-28 C33,-22 26,-18 22,-23" fill="none" stroke="var(--fern)" stroke-width="2.6" stroke-linecap="round"/>
+</g>
+{% endmacro %}
+
+{% macro conifer(x, y, s=1) %}
+<g transform="translate({{x}} {{y}}) scale({{s}})"><g class="sway-slow">
+  <rect x="-4" y="-16" width="8" height="18" fill="var(--trunk)"/>
+  <path d="M-36,-12 Q0,-2 36,-12 L5,-62 L-5,-62 Z" fill="var(--pine-dark)"/>
+  <path d="M-30,-44 Q0,-36 30,-44 L4,-88 L-4,-88 Z" fill="var(--pine-dark)"/>
+  <path d="M-22,-72 Q0,-66 22,-72 L2,-110 L-2,-110 Z" fill="var(--pine-dark)"/>
+  <path d="M-36,-12 Q-14,-6 -2,-6 L-3,-60 Z M-30,-44 Q-12,-38 -2,-38 L-2,-86 Z M-22,-72 Q-10,-68 -1,-68 L-1,-108 Z" fill="var(--pine-light)" opacity="0.9"/>
+</g></g>
+{% endmacro %}
+
+{% macro flower(x, y, r=6, petal="#fff", center="#f2c14e", stem=0) %}
+<g transform="translate({{x}} {{y}})">
+  {% if stem %}<path d="M0,0 C-5,{{ -stem * 0.4 }} 5,{{ -stem * 0.7 }} 0,{{ -stem }}" stroke="var(--grass)" stroke-width="{{ 1.5 + r * 0.08 }}" fill="none" stroke-linecap="round"/>{% endif %}
+  <g transform="translate(0 {{ -stem }})">
+    {% for a in [0, 72, 144, 216, 288] %}<ellipse cx="0" cy="{{ -r * 0.9 }}" rx="{{ r * 0.6 }}" ry="{{ r }}" fill="{{ petal }}" transform="rotate({{ a }})"/>{% endfor %}
+    <circle r="{{ r * 0.5 }}" fill="{{ center }}"/>
+  </g>
+</g>
+{% endmacro %}
+
+{% macro aleppo(x, y, s=1, chamber=false) %}
+<g transform="translate({{x}} {{y}}) scale({{s}})">
+  <path d="M-6,2 C-4,-30 -14,-60 -4,-96 C2,-112 14,-124 26,-134 L31,-129 C19,-118 11,-104 8,-92 C14,-62 6,-30 8,2 Z" fill="var(--trunk)"/>
+  <path d="M-4,-78 C-20,-94 -38,-104 -58,-106" stroke="var(--trunk)" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M6,-100 C24,-104 44,-104 62,-110" stroke="var(--trunk)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <g class="sway-slow">
+    <g fill="var(--pine-dark)">
+      <ellipse cx="-60" cy="-112" rx="42" ry="17"/><ellipse cx="-10" cy="-134" rx="56" ry="21"/><ellipse cx="42" cy="-146" rx="46" ry="18"/>
+      <ellipse cx="62" cy="-116" rx="36" ry="15"/><ellipse cx="-30" cy="-154" rx="32" ry="13"/><ellipse cx="10" cy="-110" rx="30" ry="12"/>
+    </g>
+    <g fill="var(--pine-light)">
+      <ellipse cx="-62" cy="-118" rx="30" ry="9"/><ellipse cx="-12" cy="-141" rx="40" ry="11"/><ellipse cx="40" cy="-152" rx="32" ry="9"/>
+      <ellipse cx="60" cy="-122" rx="24" ry="8"/><ellipse cx="-30" cy="-159" rx="20" ry="6"/>
+    </g>
+  </g>
+  {% if chamber %}
+  <g transform="translate(70 -128)">
+    <rect x="-14" y="-12" width="30" height="24" rx="11" fill="var(--glass)" opacity="0.75" stroke="#fff" stroke-width="2"/>
+    <path d="M-8,-6 L-8,6" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+  </g>
+  {% endif %}
+</g>
+{% endmacro %}
+
+{% macro wisp(x, y, d, delay) %}
+<g transform="translate({{x}} {{y}})"><path class="rise" style="--d:{{d}}s;--delay:{{delay}}s;--dy:-60px" d="M0,0 c5,-6 -5,-10 0,-16 c5,-6 -5,-10 0,-16" fill="none" stroke="var(--wisp)" stroke-width="1.8" stroke-linecap="round"/></g>
+{% endmacro %}
+
+{# ---------- scenes ---------- #}
+
+{% macro meadowScene(id, tall) %}
+  {{ sun(id, 210, (-60 if tall else 70), 50, 220) }}
+  {% if tall %}
+  {{ cloud(960, -330, 1.2, "90s", "-60px") }}
+  {{ cloud(620, -280, 0.7, "75s", "50px") }}
+  {{ cloud(1080, -60, 0.6, "70s", "-40px") }}
+  {% endif %}
+  {{ cloud(90, (-130 if tall else 60), 0.9, "70s", "60px") }}
+  {{ cloud(820, (-160 if tall else 50), 1.1, "85s", "-50px") }}
+  {{ cloud(250, 222, 0.55, "55s", "40px") }}
+  {{ cloudBig(560, 252, 1.05) }}
+  {{ cloud(1040, 120, 0.7, "65s", "-30px") }}
+  {{ hillFar(id) }}
+  {{ hillMid(id) }}
+  {{ tree(950, 302) }}
+  <path fill="var(--path)" opacity="0.9" d="M600,460 C640,420 760,404 820,382 C880,356 1010,350 1086,330 L1102,331 C1040,356 910,372 856,394 C790,420 744,440 730,460 Z"/>
+  {{ cottage(1110, 326, 0.95) }}
+  {{ hillNear(id) }}
+  <g>
+    {% for f in [[60,392,'#fff'],[130,382,'#f7c6d0'],[210,376,'#fff'],[300,380,'#f6e08f'],[380,384,'#fff'],[470,388,'#f7c6d0'],[760,392,'#fff'],[840,380,'#f6e08f'],[930,374,'#f7c6d0'],[1010,376,'#fff'],[1120,384,'#f6e08f'],[1170,388,'#fff'],[250,398,'#f7c6d0'],[420,402,'#fff'],[1060,398,'#fff']] %}
+    <circle cx="{{f[0]}}" cy="{{f[1]}}" r="3.2" fill="{{f[2]}}" opacity="0.95"/>
+    {% endfor %}
+  </g>
+  {{ tufts([[40,388],[120,376],[230,372],[340,378],[450,386],[560,394],[660,398],[770,390],[870,378],[960,374],[1060,376],[1150,382]]) }}
+  {% for s in [[80,330,520,-300,26,0,1.3],[260,380,640,-320,32,-8,1],[150,250,700,-240,38,-15,0.9],[420,360,600,-330,30,-20,1.15],[40,200,800,-200,44,-30,0.8],[600,380,520,-300,28,-4,1],[330,300,700,-260,36,-24,0.9]] %}
+    {{ seed(s[0], s[1], s[2], s[3], s[4], s[5], s[6]) }}
+  {% endfor %}
+{% endmacro %}
+
+{% macro sunlightScene(id) %}
+  <g transform="translate(820 150)">
+    <g class="spin" style="--d:160s">
+      <g fill="var(--sun)" opacity="0.4">
+        {% for a in range(0, 360, 24) %}<path d="M-7,-60 L0,-420 L7,-60 Z" transform="rotate({{a}})"/>{% endfor %}
+      </g>
+    </g>
+  </g>
+  {{ sun(id, 820, 150, 54, 240) }}
+  {{ cloud(120, 130, 0.85, "70s", "50px") }}
+  {{ cloud(420, 110, 0.6, "60s", "-40px") }}
+  {{ cloud(1020, 190, 0.8, "80s", "-40px") }}
+  {{ hillFar(id) }}
+  {{ hillMid(id) }}
+  {% for b in [[180,318,1],[250,322,0.7],[640,312,0.8]] %}
+  <g transform="translate({{b[0]}} {{b[1]}}) scale({{b[2]}})"><circle cx="-14" cy="-6" r="16" fill="var(--leaf-dark)"/><circle cx="8" cy="-12" r="20" fill="var(--leaf-dark)"/><circle cx="-6" cy="-14" r="13" fill="var(--leaf-light)"/><circle cx="12" cy="-18" r="12" fill="var(--leaf-light)"/></g>
+  {% endfor %}
+  {{ hillNear(id) }}
+  {{ leaf(860, 452, -24, 1.55) }}
+  {{ leaf(330, 470, -158, 1.05) }}
+  {{ tufts([[60,386],[160,372],[460,384],[560,392],[700,394],[1100,376],[1170,382]]) }}
+  {% for p in [[900,330,0.9,7,0],[980,300,1.2,8,-2],[1060,340,0.8,6,-4],[760,350,1,9,-1],[1120,290,0.7,7,-5],[840,280,0.6,6,-3],[300,380,0.8,8,-2],[380,350,1,7,-6],[240,360,0.7,9,-4]] %}
+    {{ sparkle(p[0], p[1], p[2], p[3], p[4]) }}
+  {% endfor %}
+{% endmacro %}
+
+{% macro duskScene(id, network=false) %}
+  {% set stars = [[90,60],[170,130],[250,40],[360,100],[470,30],[560,140],[650,70],[760,30],[1080,40],[1150,140],[320,180],[700,190],[1010,190],[140,210],[880,160]] %}
+  <g transform="translate(0 50)">
+  <g fill="#fffaf0">
+    {% for st in stars %}<circle class="twinkle" style="--d:{{ 2 + loop.index % 4 }}s;--delay:-{{ loop.index * 0.4 }}s" cx="{{st[0]}}" cy="{{st[1]}}" r="{{ 1.4 + loop.index % 3 * 0.6 }}"/>{% endfor %}
+  </g>
+  {% if network %}
+  <g fill="none" stroke="#fffaf0" stroke-width="1.2" stroke-linecap="round" class="pulse">
+    <path d="M90,60 L170,130 L250,40 L360,100 L470,30 M360,100 L560,140 L650,70 L760,30 M560,140 L700,190 L880,160 L1010,190 L1150,140 L1080,40 M170,130 L320,180 L140,210 M320,180 L360,100 M650,70 L880,160"/>
+  </g>
+  <g fill="#fffaf0">
+    {% for n in [[170,130],[360,100],[560,140],[650,70],[880,160],[320,180],[1010,190]] %}<circle cx="{{n[0]}}" cy="{{n[1]}}" r="4.5" opacity="0.95"/>{% endfor %}
+  </g>
+  {% endif %}
+  </g>
+  {{ sun(id, 960, 135, 30, 130) }}
+  <circle cx="972" cy="127" r="27" fill="var(--sky-1)" opacity="0.55"/>
+  {{ cloud(500, 230, 0.8, "90s", "60px") }}
+  {{ cloud(40, 260, 0.6, "70s", "50px") }}
+  {{ hillFar(id) }}
+  {{ hillMid(id) }}
+  {{ tree(330, 318, 0.7) }}
+  {{ cottage(1000, 322, 0.9, true) }}
+  {{ hillNear(id) }}
+  {{ tufts([[60,388],[180,372],[300,374],[420,382],[540,392],[650,398],[780,388],[880,376],[1100,376],[1170,382]]) }}
+  {% for f in [[120,330,30,-20,9,3.1,0],[220,280,-24,18,11,2.4,2],[420,320,40,-14,10,3.6,4],[520,270,-30,-22,12,2.8,1],[640,340,26,16,9,3.3,6],[760,300,-36,-12,13,2.6,3],[860,250,20,-26,10,3.9,5],[1080,300,-28,18,12,2.9,2],[1150,240,24,-16,9,3.4,7],[300,230,30,20,14,2.5,8],[960,360,-22,-18,11,3.0,9],[580,380,18,-24,10,2.7,1]] %}
+    {{ firefly(id, f[0], f[1], f[2], f[3], f[4], f[5], f[6]) }}
+  {% endfor %}
+{% endmacro %}
+
+{% macro fungusScene(id) %}
+  <g fill="#fff" opacity="0.22">
+    <path d="M140,-40 L260,-40 L560,460 L380,460 Z"/><path d="M420,-40 L480,-40 L760,460 L660,460 Z"/><path d="M700,-40 L800,-40 L1080,460 L930,460 Z"/>
+  </g>
+  <g fill="var(--trunk-far)">
+    {% for t in [[60,34],[230,28],[470,40],[640,30],[880,36],[1120,32]] %}<path d="M{{t[0] - t[1]/2}},360 C{{t[0] - t[1]/2 + 4}},200 {{t[0] - t[1]/2}},80 {{t[0] - t[1]/2 + 2}},-20 L{{t[0] + t[1]/2 - 2}},-20 C{{t[0] + t[1]/2}},80 {{t[0] + t[1]/2 - 4}},200 {{t[0] + t[1]/2}},360 Z"/>{% endfor %}
+  </g>
+  <g fill="var(--canopy)">
+    {% for c in [[0,0,120],[180,-30,130],[380,10,110],[560,-30,140],[760,0,120],[950,-30,130],[1150,0,120]] %}<circle cx="{{c[0]}}" cy="{{c[1]}}" r="{{c[2]}}"/>{% endfor %}
+  </g>
+  <g fill="var(--canopy-light)" opacity="0.8">
+    {% for c in [[90,40,60],[290,50,50],[480,60,56],[680,50,60],[870,56,50],[1060,44,56]] %}<circle cx="{{c[0]}}" cy="{{c[1]}}" r="{{c[2]}}"/>{% endfor %}
+  </g>
+  {{ hillFar(id) }}
+  <g fill="var(--trunk)">
+    {% for t in [[160,330,46],[760,316,54],[1040,326,40]] %}<path d="M{{t[0] - t[2]/2 - 14}},{{t[1]}} C{{t[0] - t[2]/2}},{{t[1] - 10}} {{t[0] - t[2]/2 + 2}},{{t[1] - 60}} {{t[0] - t[2]/2 + 4}},-30 L{{t[0] + t[2]/2 - 4}},-30 C{{t[0] + t[2]/2 - 2}},{{t[1] - 60}} {{t[0] + t[2]/2}},{{t[1] - 10}} {{t[0] + t[2]/2 + 14}},{{t[1]}} Z"/>{% endfor %}
+  </g>
+  {{ hillMid(id) }}
+  {{ mushroom(200, 334, 1.1) }}{{ mushroom(236, 338, 0.7, "var(--cap-2)") }}{{ mushroom(800, 318, 0.9) }}
+  {{ hillNear(id) }}
+  {{ mushroom(340, 384, 1.4) }}{{ mushroom(384, 388, 0.9, "var(--cap-2)") }}{{ mushroom(306, 392, 0.75) }}
+  {{ mushroom(1090, 380, 1.2, "var(--cap-2)") }}{{ mushroom(1130, 384, 0.8) }}
+  {{ leaf(560, 440, -36, 1.35, true) }}
+  {{ tufts([[40,390],[120,378],[460,384],[700,396],[940,372],[1010,372],[1180,384]]) }}
+  {% for m in [[300,300,160,-160,18,0],[420,340,220,-200,22,-6],[620,300,180,-180,20,-12],[860,330,200,-220,24,-3],[980,280,160,-150,19,-9],[520,360,240,-240,26,-15],[700,250,200,-160,21,-18]] %}
+    {{ mote(m[0], m[1], m[2], m[3], m[4], m[5], 2.6, "var(--spore)") }}
+  {% endfor %}
+{% endmacro %}
+
+{% macro evolutionScene(id) %}
+  {{ sun(id, 200, 130, 44, 180) }}
+  {{ cloud(420, 130, 0.8, "70s", "50px") }}
+  {{ cloud(760, 110, 1, "85s", "-40px") }}
+  {{ cloud(1060, 175, 0.6, "60s", "-30px") }}
+  {{ hillFar(id) }}
+  {{ hillMid(id) }}
+  {{ conifer(700, 318, 1.05) }}{{ conifer(752, 314, 0.75) }}{{ conifer(650, 322, 0.6) }}
+  {{ tree(980, 316, 0.95, true) }}
+  {{ hillNear(id) }}
+  <ellipse cx="170" cy="414" rx="190" ry="36" fill="var(--water)"/>
+  <path d="M60,410 C100,404 140,404 180,410 M210,422 C250,416 290,416 320,420" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity="0.7"/>
+  <g fill="var(--leaf-light)"><ellipse cx="110" cy="420" rx="20" ry="6"/><ellipse cx="250" cy="406" rx="16" ry="5"/></g>
+  <g fill="var(--algae)">{% for a in [[70,424],[86,418],[140,428],[200,420],[226,430],[290,426],[160,412],[300,410]] %}<circle cx="{{a[0]}}" cy="{{a[1]}}" r="2.5"/>{% endfor %}</g>
+  <ellipse cx="400" cy="396" rx="46" ry="20" fill="var(--rock)"/>
+  <g fill="var(--moss)">{% for b in [[370,384,12],[390,378,15],[414,380,13],[432,388,9],[358,392,8]] %}<circle cx="{{b[0]}}" cy="{{b[1]}}" r="{{b[2]}}"/>{% endfor %}</g>
+  {{ fern(530, 392, 0.85) }}
+  <path d="M120,440 C260,440 330,410 420,404 C520,398 560,400 640,392 C760,380 860,372 980,360" fill="none" stroke="var(--trail)" stroke-width="4" stroke-dasharray="1 12" stroke-linecap="round"/>
+  {{ tufts([[600,398],[820,384],[900,374],[1100,376],[1170,384]]) }}
+  {% for s in [[300,330,500,-260,30,-3,0.9],[560,360,520,-300,34,-12,1],[200,280,620,-220,40,-20,0.8],[680,330,420,-280,28,-6,1.1]] %}
+    {{ seed(s[0], s[1], s[2], s[3], s[4], s[5], s[6]) }}
+  {% endfor %}
+{% endmacro %}
+
+{% macro pollenScene(id) %}
+  {{ sun(id, 980, 135, 46, 200) }}
+  {{ cloud(150, 125, 0.9, "75s", "50px") }}
+  {{ cloud(560, 145, 0.7, "65s", "-40px") }}
+  {{ cloudBig(700, 290, 0.6, "100s", "-40px") }}
+  {{ hillFar(id) }}
+  {{ hillMid(id) }}
+  {% set cols = ["#fff", "#f7c6d0", "#f6e08f", "#e3d3f3", "#fff", "#f9d2b8"] %}
+  {% for f in [[480,322],[540,326],[600,320],[680,306],[760,298],[830,296],[900,300],[960,306],[1030,314],[1100,318],[1160,316],[620,334],[720,320],[880,314],[1000,326]] %}
+    {{ flower(f[0], f[1], 5, cols[loop.index % 6], "#f2c14e", 8) }}
+  {% endfor %}
+  {{ hillNear(id) }}
+  {% for f in [[460,394],[540,398],[640,400],[740,392],[820,384],[910,374],[990,372],[1080,376],[1150,382],[600,416],[860,404],[1020,398]] %}
+    {{ flower(f[0], f[1], 7, cols[(loop.index + 2) % 6], "#efb94a", 12) }}
+  {% endfor %}
+  <g class="sway" style="--d:7s">{{ flower(110, 460, 22, "#fbe6ea", "#f0b84a", 170) }}</g>
+  <g class="sway" style="--d:6s;--delay:-2s">{{ flower(220, 460, 17, "#fff6e3", "#efb94a", 120) }}</g>
+  <g class="sway" style="--d:8s;--delay:-4s">{{ flower(320, 460, 13, "#efe3fa", "#f0b84a", 84) }}</g>
+  {{ tufts([[40,390],[160,380],[270,386],[380,388],[700,398],[960,378],[1120,380]]) }}
+  {% for m in [[110,290,520,-180,20,0],[220,340,600,-160,24,-5],[320,376,480,-200,18,-10],[130,320,700,-220,26,-14],[230,360,560,-120,22,-3],[100,300,640,-260,28,-18],[320,380,700,-180,25,-8],[200,330,480,-240,19,-12]] %}
+    {{ mote(m[0], m[1], m[2], m[3], m[4], m[5], 3, "var(--mote)") }}
+  {% endfor %}
+{% endmacro %}
+
+{% macro greenhouseScene(id) %}
+  {{ sun(id, 200, 135, 46, 200) }}
+  {{ cloud(420, 115, 0.8, "70s", "40px") }}
+  {{ cloud(900, 110, 1, "90s", "-50px") }}
+  {{ hillFar(id) }}
+  {{ hillMid(id) }}
+  {{ tree(160, 330, 0.7) }}
+  {{ tree(1080, 318, 0.6) }}
+  <g transform="translate(610 364) scale(0.92)">
+    <rect x="-220" y="-26" width="440" height="30" rx="4" fill="var(--wall)"/>
+    <path d="M-210,-26 L-210,-120 C-210,-206 210,-206 210,-120 L210,-26 Z" fill="var(--glass)" opacity="0.6"/>
+    <g fill="var(--leaf-dark)">
+      {% for x in range(-180, 200, 36) %}<ellipse cx="{{x}}" cy="-62" rx="9" ry="26" transform="rotate({{ (loop.index % 3 - 1) * 10 }} {{x}} -40)"/>{% endfor %}
+    </g>
+    <g>
+      {% for x in range(-190, 210, 30) %}
+      <g transform="translate({{x}} -30)"><circle cx="-7" cy="-4" r="11" fill="var(--lettuce-dark)"/><circle cx="7" cy="-4" r="11" fill="var(--lettuce-dark)"/><circle cx="0" cy="-12" r="11" fill="var(--lettuce)"/><circle cx="-2" cy="-14" r="5" fill="var(--leaf-hi)"/></g>
+      {% endfor %}
+    </g>
+    <g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-210,-26 L-210,-120 C-210,-206 210,-206 210,-120 L210,-26"/>
+      <path d="M-210,-120 L210,-120"/>
+      <path d="M-140,-26 L-140,-161 M-70,-26 L-70,-174 M0,-26 L0,-178 M70,-26 L70,-174 M140,-26 L140,-161"/>
+    </g>
+    <g fill="#fff" opacity="0.55"><path d="M-190,-60 L-160,-60 L-120,-150 L-150,-150 Z"/><path d="M40,-70 L58,-70 L90,-160 L72,-160 Z"/></g>
+  </g>
+  {{ hillNear(id) }}
+  {{ tufts([[40,388],[140,376],[260,372],[960,370],[1060,370],[1160,382]]) }}
+  {% for p in [[460,240,0.8,8,0],[700,220,1,9,-3],[540,260,0.7,7,-5],[820,250,0.9,8,-2]] %}
+    {{ sparkle(p[0], p[1], p[2], p[3], p[4]) }}
+  {% endfor %}
+{% endmacro %}
+
+{% macro pinesScene(id) %}
+  {{ sun(id, 290, 140, 60, 280) }}
+  {{ cloud(620, 115, 0.7, "80s", "40px") }}
+  {{ cloud(980, 140, 0.9, "95s", "-50px") }}
+  {{ hillFar(id) }}
+  {{ hillMid(id) }}
+  {{ aleppo(560, 330, 0.95) }}
+  {{ aleppo(790, 300, 0.75) }}
+  {{ aleppo(980, 312, 1.25, true) }}
+  {% for w in [[520,200,7,0],[600,190,8,-3],[960,140,7,-1],[1040,150,9,-5],[780,210,8,-2],[900,160,7,-6]] %}
+    {{ wisp(w[0], w[1], w[2], w[3]) }}
+  {% endfor %}
+  {{ hillNear(id) }}
+  <g fill="none" stroke="var(--shimmer)" stroke-width="2" stroke-linecap="round">
+    {% for sh in [[120,350,0],[380,370,-2],[700,360,-4],[1000,350,-1],[260,330,-3]] %}
+    <path class="rise" style="--d:6s;--delay:{{sh[2]}}s;--dy:-30px" d="M{{sh[0]}},{{sh[1]}} c10,-6 20,6 30,0 c10,-6 20,6 30,0"/>
+    {% endfor %}
+  </g>
+  {{ tufts([[40,388],[140,374],[260,372],[380,380],[480,388],[660,396],[760,390],[880,376],[1100,374],[1170,382]]) }}
+{% endmacro %}
+
+{# ---------- the public macro ---------- #}
+
+{% macro scene(name, id, tall=false, label="", align="xMidYMax") %}
+{% set top = -420 if tall else 0 %}
+<svg class="scene scene--{{ 'dusk' if name == 'network' else name }}" viewBox="0 {{ top }} 1200 {{ 440 - top }}" preserveAspectRatio="{{ align }} slice" role="img" aria-label="{{ label or 'Hand-drawn landscape illustration' }}" focusable="false">
+  {{ defs(id, top) }}
+  <rect x="-50" y="{{ top - 40 }}" width="1300" height="{{ 520 - top }}" fill="url(#{{id}}-sky)"/>
+  {% if name == "meadow" %}{{ meadowScene(id, tall) }}
+  {% elif name == "sunlight" %}{{ sunlightScene(id) }}
+  {% elif name == "dusk" %}{{ duskScene(id) }}
+  {% elif name == "network" %}{{ duskScene(id, true) }}
+  {% elif name == "fungus" %}{{ fungusScene(id) }}
+  {% elif name == "evolution" %}{{ evolutionScene(id) }}
+  {% elif name == "pollen" %}{{ pollenScene(id) }}
+  {% elif name == "greenhouse" %}{{ greenhouseScene(id) }}
+  {% elif name == "pines" %}{{ pinesScene(id) }}
+  {% endif %}
+</svg>
+{% endmacro %}

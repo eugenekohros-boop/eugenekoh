@@ -1,0 +1,83 @@
+---
+layout: layouts/base.njk
+title: "Teaching & talks"
+description: "Courses, lectures, seminars and mentoring by Eugene Koh."
+---
+{% from "partials/scenes.njk" import scene %}
+{% from "partials/icons.njk" import icon %}
+
+<div class="hero-scene hero-scene--page hero-scene--short">
+  {{ scene("dusk", "teaching", label="A lavender dusk with fireflies glowing above the hills and a cottage with lit windows") }}
+</div>
+
+<div class="wrap">
+  <header class="page-head card">
+    <p class="eyebrow"><span class="eyebrow-icon">{{ icon("cap", 18) }}</span> Teaching</p>
+    <h1>Teaching &amp; talks</h1>
+    <p class="lede">The courses I teach, the talks I've given and the people I've mentored. Where slides or recordings exist, each talk links to its own page.</p>
+  </header>
+
+  <section class="section-tight" aria-labelledby="courses-h">
+    <div class="section-head"><h2 id="courses-h">{{ icon("cap", 24) }} Courses</h2></div>
+    <div class="course-grid">
+      {% for c in collections.courses %}
+      <a class="course-card" href="{{ c.url }}">
+        <span class="course-term">{{ c.data.term }}</span>
+        <h3>{{ c.data.title }}</h3>
+        <p class="course-where">{{ c.data.institution }}</p>
+        <p>{{ c.data.summary }}</p>
+        <span class="course-foot"><span class="badge">{{ c.data.role }}</span>{% if c.data.audience %}<span class="badge badge-soft">{{ c.data.audience }}</span>{% endif %}</span>
+      </a>
+      {% endfor %}
+      <div class="course-card course-card--seed" aria-label="Future courses">
+        <span class="seed-icon">{{ icon("sprout", 34) }}</span>
+        <h3>More courses on the way</h3>
+        <p>New courses and their materials will appear here.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight" aria-labelledby="talks-h">
+    <div class="section-head"><h2 id="talks-h">{{ icon("mic", 24) }} Lectures &amp; talks</h2></div>
+    <div class="talk-years">
+      {% for group in collections.lectures | groupByYear %}
+      <div class="talk-year">
+        <h3 class="year-label">{{ group.year }}</h3>
+        <ul class="talk-list">
+          {% for l in group.items %}
+          <li class="talk">
+            <span class="badge badge-soft">{{ l.data.kind }}</span>
+            <div class="talk-body">
+              {% if l.url %}
+                <a class="talk-title" href="{{ l.url }}">{{ l.data.talk_title or l.data.event }}</a>
+              {% else %}
+                <span class="talk-title">{{ l.data.talk_title or l.data.event }}</span>
+              {% endif %}
+              <span class="talk-meta">{% if l.data.talk_title %}{{ l.data.event }} · {% endif %}{{ l.data.location }}</span>
+            </div>
+            {% if l.data.slides %}<a class="talk-chip" href="{{ l.url }}">{{ icon("file", 15) }} Slides</a>{% endif %}
+            {% if l.data.video %}<a class="talk-chip" href="{{ l.url }}">{{ icon("play", 15) }} Video</a>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="section-tight" aria-labelledby="mentoring-h">
+    <div class="section-head"><h2 id="mentoring-h">{{ icon("sprout", 24) }} Mentoring</h2></div>
+    <ul class="stats">
+      <li><strong>10+</strong><span>students and staff supervised</span></li>
+      <li><strong>High school → PhD</strong><span>the full range of career stages</span></li>
+      <li><strong>10</strong><span>interns coordinated to build a plant stress database</span></li>
+    </ul>
+    <ul class="mentor-list">
+      <li><span class="mentor-when">2026 – now</span> Undergraduate independent research projects, NTU</li>
+      <li><span class="mentor-when">2024 – 2025</span> A team of 10 research interns developing a plant stress database, NTU</li>
+      <li><span class="mentor-when">2023 – now</span> A Final-Year-Project student and a Research Officer, NTU</li>
+      <li><span class="mentor-when">2021 – 2022</span> Two Assistant Research Officers, Temasek Life Sciences Laboratory</li>
+      <li><span class="mentor-when">2016 – 2020</span> Bachelor's, Master's, PhD and visiting students, and high-school students in the World ORT programme, Weizmann Institute of Science</li>
+    </ul>
+  </section>
+</div>

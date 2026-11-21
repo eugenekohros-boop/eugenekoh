@@ -1,0 +1,45 @@
+---
+layout: layouts/base.njk
+---
+{% from "partials/scenes.njk" import scene %}
+{% from "partials/icons.njk" import icon %}
+
+<article class="course">
+  <div class="hero-scene hero-scene--page hero-scene--short">
+    {{ scene(art or "meadow", "course") }}
+  </div>
+  <div class="wrap wrap-narrow">
+    <header class="pub-head card">
+      <a class="crumb" href="/teaching/">{{ icon("back", 16) }} Teaching &amp; talks</a>
+      <p class="eyebrow"><span class="eyebrow-icon">{{ icon("cap", 18) }}</span> Course{% if status %} · {{ status }}{% endif %}</p>
+      <h1>{{ title }}</h1>
+      <dl class="pub-facts">
+        <div><dt>Where</dt><dd>{{ institution }}</dd></div>
+        <div><dt>When</dt><dd>{{ term }}</dd></div>
+        <div><dt>My role</dt><dd>{{ role }}</dd></div>
+        {% if audience %}<div><dt>Who it's for</dt><dd>{{ audience }}</dd></div>{% endif %}
+      </dl>
+    </header>
+
+    {% if summary %}
+    <section class="nutshell"><h2><span class="nutshell-icon">{{ icon("leaf", 20) }}</span> About the course</h2><p>{{ summary }}</p></section>
+    {% endif %}
+
+    <div class="prose">{{ content | safe }}</div>
+
+    {% if modules %}
+    <section class="modules" aria-labelledby="modules-h">
+      <h2 id="modules-h">Lessons</h2>
+      <ol class="module-list">
+        {% for m in modules %}
+        <li>
+          <h3>{{ m.title }}</h3>
+          {% if m.summary %}<p>{{ m.summary }}</p>{% endif %}
+          {% if m.materials %}<p class="module-links">{% for x in m.materials %}<a href="{{ x.url }}">{{ icon("file", 15) }} {{ x.label }}</a>{% endfor %}</p>{% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+    {% endif %}
+  </div>
+</article>

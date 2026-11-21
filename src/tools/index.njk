@@ -1,0 +1,24 @@
+---
+layout: layouts/base.njk
+title: Tools
+description: "Free bioinformatic web tools by Eugene Koh, including the Plant Expression Omnibus (PEO)."
+---
+{% from "partials/scenes.njk" import scene %}
+{% from "partials/icons.njk" import icon %}
+{% from "partials/cards.njk" import toolCard %}
+
+<div class="hero-scene hero-scene--page hero-scene--short">
+  {{ scene("greenhouse", "tools", label="A glasshouse full of leafy greens on a sunny hillside") }}
+</div>
+
+<div class="wrap">
+  <header class="page-head card">
+    <p class="eyebrow"><span class="eyebrow-icon">{{ icon("tool", 18) }}</span> Tools</p>
+    <h1>Tools for the community</h1>
+    <p class="lede">Free web resources I've built or helped build, so that any biologist can explore plant gene expression without writing code.</p>
+  </header>
+
+  <div class="tool-grid tool-grid--page">
+    {% for t in tools %}{{ toolCard(t) }}{% endfor %}
+  </div>
+</div>

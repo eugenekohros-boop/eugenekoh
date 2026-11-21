@@ -1,0 +1,23 @@
+node_modules/
+_site/
+.DS_Store
+Thumbs.db
+
+# Private: never published
+References/
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+
+# Safety net: office files, Word/Excel lock files and backups never belong in the public repo
+# (slides go on the site as PDFs in src/assets/lectures/)
+*.xlsx
+*.xls
+*.xlsm
+*.csv
+*.pptx
+*.ppt
+*.docx
+*.doc
+~$*
+*.bak

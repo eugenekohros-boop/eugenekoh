@@ -1,0 +1,43 @@
+---
+layout: layouts/base.njk
+---
+{% from "partials/scenes.njk" import scene %}
+{% from "partials/icons.njk" import icon %}
+{% set embed = null %}{% if video %}{% set embed = video | videoEmbed %}{% endif %}
+
+<article class="lecture">
+  <div class="hero-scene hero-scene--page hero-scene--short">
+    {{ scene(art or "dusk", "lec") }}
+  </div>
+  <div class="wrap wrap-narrow">
+    <header class="pub-head card">
+      <a class="crumb" href="/teaching/">{{ icon("back", 16) }} Teaching &amp; talks</a>
+      <p class="eyebrow"><span class="eyebrow-icon">{{ icon("mic", 18) }}</span> {{ kind }}</p>
+      <h1>{{ talk_title or title }}</h1>
+      <dl class="pub-facts">
+        <div><dt>Event</dt><dd>{{ event or title }}</dd></div>
+        <div><dt>When</dt><dd>{% if show_month %}{{ page.date | monthYear }}{% else %}{{ page.date | year }}{% endif %}</dd></div>
+        {% if location %}<div><dt>Where</dt><dd>{{ location }}</dd></div>{% endif %}
+      </dl>
+      <div class="pub-actions">
+        {% if slides %}<a class="btn btn-primary" href="{{ slides }}" target="_blank" rel="noopener">{{ icon("file", 16) }} Slides</a>{% endif %}
+        {% if video %}<a class="btn btn-ghost" href="{{ video }}" target="_blank" rel="noopener">{{ icon("play", 16) }} Watch</a>{% endif %}
+        {% for l in links %}<a class="btn btn-ghost" href="{{ l.url }}">{{ l.label }}</a>{% endfor %}
+      </div>
+    </header>
+
+    {% if summary %}
+    <section class="nutshell"><h2><span class="nutshell-icon">{{ icon("leaf", 20) }}</span> About this talk</h2><p>{{ summary }}</p></section>
+    {% endif %}
+
+    {% if embed %}
+    <div class="embed embed-video"><iframe src="{{ embed }}" title="Video: {{ talk_title or title }}" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
+    {% endif %}
+
+    {% if slides and slides.endsWith(".pdf") %}
+    <div class="embed embed-slides"><iframe src="{{ slides }}" title="Slides: {{ talk_title or title }}" loading="lazy"></iframe></div>
+    {% endif %}
+
+    <div class="prose">{{ content | safe }}</div>
+  </div>
+</article>

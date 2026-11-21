@@ -1,0 +1,23 @@
+{% from "partials/icons.njk" import icon %}
+<footer class="site-footer">
+  <svg class="footer-grass" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <path d="M0,46 C150,26 300,38 450,44 C620,52 760,22 920,28 C1040,32 1120,44 1200,38 L1200,80 L0,80 Z" fill="var(--hill-a)"/>
+    <path d="M0,60 C180,46 360,56 540,60 C720,64 900,46 1080,52 C1140,54 1180,58 1200,56 L1200,80 L0,80 Z" fill="var(--hill-b)"/>
+  </svg>
+  <div class="footer-body">
+    <div class="wrap footer-inner">
+      <div class="footer-about">
+        <p class="footer-name">{{ site.fullName }}</p>
+        <p>{{ site.affiliation }}</p>
+      </div>
+      <ul class="footer-links">
+        <li><a href="mailto:{{ site.email }}">{{ icon("mail", 18) }} Email</a></li>
+        <li><a href="{{ site.orcid }}" rel="me">{{ icon("orcid", 18) }} ORCID</a></li>
+        <li><a href="{{ site.linkedin }}" rel="me">{{ icon("linkedin", 18) }} LinkedIn</a></li>
+      </ul>
+    </div>
+    <div class="wrap footer-fine">
+      <p>© {{ site.year }} {{ site.name }}. Illustrations are original artwork made for this site.</p>
+    </div>
+  </div>
+</footer>

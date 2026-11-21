@@ -1,0 +1,42 @@
+{% from "partials/icons.njk" import icon %}
+
+{# A publication card, used on the home and research pages #}
+{% macro pubCard(p) %}
+<article class="pub-card t-{{ p.data.thread }}" data-thread="{{ p.data.thread }}">
+  <a class="pub-card-link" href="{{ p.url }}">
+    <span class="pub-card-icon">{{ icon(p.data.icon or "leaf", 26) }}</span>
+    <span class="pub-card-meta">{{ p.date | year }} · {{ p.data.journal }}</span>
+    <h3 class="pub-card-title">{{ p.data.plain_title }}</h3>
+    <p class="pub-card-formal">{{ p.data.title }}</p>
+    <span class="pub-card-foot">
+      <span class="badge">{{ p.data.role }}</span>
+      {% if p.data.status %}<span class="badge badge-soft">{{ p.data.status }}</span>{% endif %}
+      <span class="pub-card-more">Read the story {{ icon("arrow", 16) }}</span>
+    </span>
+  </a>
+</article>
+{% endmacro %}
+
+{# A small tool card #}
+{% macro toolCard(t) %}
+<article class="tool-card">
+  <div class="tool-card-head">
+    <span class="tool-card-icon">{{ icon(t.icon, 28) }}</span>
+    <div>
+      <h3>{{ t.name }}</h3>
+      <p class="tool-card-long">{{ t.longName }}</p>
+    </div>
+  </div>
+  <p>{{ t.description }}</p>
+  {% if t.stats %}
+  <ul class="stat-row">
+    {% for s in t.stats %}<li><strong>{{ s.value }}</strong> {{ s.label }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  <div class="tool-card-actions">
+    <a class="btn btn-primary" href="{{ t.url }}" target="_blank" rel="noopener">Open {{ t.name }} {{ icon("external", 16) }}</a>
+    {% if t.paper %}<a class="btn btn-ghost" href="{{ t.paper }}">About the paper</a>{% endif %}
+  </div>
+  <p class="tool-card-role">My role: {{ t.role }}</p>
+</article>
+{% endmacro %}

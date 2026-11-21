@@ -1,0 +1,30 @@
+{% from "partials/icons.njk" import icon %}
+{% set nav = [
+  { label: "Research", url: "/research/" },
+  { label: "Teaching", url: "/teaching/" },
+  { label: "Tools", url: "/tools/" },
+  { label: "About", url: "/#about" },
+  { label: "Contact", url: "/#contact" }
+] %}
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/" aria-label="{{ site.name }}, home">
+      <span class="brand-mark">{{ icon("leaf", 22) }}</span>
+      <span class="brand-name">{{ site.name }}</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="nav-toggle-open">{{ icon("menu", 22) }}</span>
+      <span class="nav-toggle-close">{{ icon("close", 22) }}</span>
+      <span class="visually-hidden">Menu</span>
+    </button>
+    <nav id="site-nav" class="site-nav" aria-label="Main">
+      <ul>
+        {% set currentUrl = page.url or "" %}
+        {% for item in nav %}
+        {% set active = (item.url.indexOf("#") == -1) and currentUrl.startsWith(item.url) %}
+        <li><a href="{{ item.url }}"{% if active %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+</header>

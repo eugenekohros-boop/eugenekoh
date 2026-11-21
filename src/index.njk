@@ -1,0 +1,128 @@
+---
+layout: layouts/base.njk
+bodyClass: home
+---
+{% from "partials/scenes.njk" import scene %}
+{% from "partials/icons.njk" import icon %}
+{% from "partials/cards.njk" import pubCard, toolCard %}
+
+<section class="home-hero">
+  <div class="home-hero-art">
+    {{ scene("meadow", "hero", tall=true, align="xMaxYMax", label="Rolling green hills under towering summer clouds, with a big tree, a red-roofed cottage and dandelion seeds drifting on the wind") }}
+  </div>
+  <div class="wrap home-hero-text">
+    <p class="kicker">Hello, I'm</p>
+    <h1>{{ site.name }}</h1>
+    <p class="lede">{{ site.role }}. I study how plants sense and survive stress, from a single fleeting molecule of oxygen to 700 million years of plant evolution.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="/research/">Explore my research {{ icon("arrow", 16) }}</a>
+      <a class="btn btn-ghost" href="/teaching/">Teaching &amp; talks</a>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="section wrap about" aria-labelledby="about-h">
+  <div class="about-grid">
+    <div class="about-portrait">
+      {% if site.portrait %}
+        <img src="{{ site.portrait }}" alt="Portrait of {{ site.name }}" width="320" height="320">
+      {% else %}
+        <div class="portrait-placeholder" aria-hidden="true">{{ icon("sprout", 64) }}</div>
+      {% endif %}
+    </div>
+    <div class="about-text">
+      <h2 id="about-h">About me</h2>
+      <p>I'm a plant molecular biologist and computational biologist, currently a Research Fellow at Nanyang Technological University in Singapore. My research asks one question at many scales: <strong>how do plants sense and survive stress?</strong></p>
+      <p>During my MSc, PhD and postdoc at the Weizmann Institute of Science, I worked at the bench on singlet oxygen, a fleeting, highly reactive form of oxygen. I showed how it damages membranes and RNA, and how plants turn that damage into a signal. Today I work at the scale of the whole plant kingdom. I build comparative transcriptomic resources such as the <a href="/research/2023-plant-expression-omnibus/">Plant Expression Omnibus</a> and use AI to find stress responses that have been shared across <a href="/research/2026-kingdom-wide-stress-atlas/">hundreds of millions of years</a> of plant evolution.</p>
+      <p>Before returning to research, I spent two years as a Technology Transfer Officer at A*STAR, where I secured grants, negotiated licences and managed a spin-off company. Moving between the bench, the computer and the market shapes how I work: generate the data, find the insight at scale, and carry it toward real-world use.</p>
+    </div>
+  </div>
+
+  <ul class="pillars">
+    <li class="pillar t-ros">
+      <span class="pillar-icon">{{ icon("flask", 26) }}</span>
+      <h3>At the bench</h3>
+      <p>First-author discoveries on singlet oxygen and RNA oxidation in <em>Plant Physiology</em> and <em>Plant, Cell &amp; Environment</em>. Also trained in antibody engineering at GlaxoSmithKline.</p>
+    </li>
+    <li class="pillar t-kingdom">
+      <span class="pillar-icon">{{ icon("laptop", 26) }}</span>
+      <h3>At the computer</h3>
+      <p>Comparative genomics and transcriptomics, databases used across the plant-science community, and AI/ML for large biological datasets, in Python, R, MATLAB and Bash.</p>
+    </li>
+    <li class="pillar t-field">
+      <span class="pillar-icon">{{ icon("handshake", 26) }}</span>
+      <h3>Toward the market</h3>
+      <p>Two years in technology transfer at A*STAR: 3 commercialisation grants, 2 licensing agreements and a molecular-diagnostics spin-off.</p>
+    </li>
+  </ul>
+</section>
+
+<section class="section threads-section" aria-labelledby="threads-h">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 id="threads-h">Research threads</h2>
+    </div>
+    <div class="thread-grid">
+      {% for t in threads %}
+      {% set count = (collections.publications | where("data.thread", t.key)).length %}
+      <a class="thread-card t-{{ t.key }}" href="/research/#{{ t.key }}">
+        <span class="thread-icon">{{ icon(t.icon, 30) }}</span>
+        <h3>{{ t.name }}</h3>
+        <p>{{ t.blurb }}</p>
+        <span class="thread-count">{{ count }} {{ "paper" if count == 1 else "papers" }} {{ icon("arrow", 16) }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section wrap" aria-labelledby="latest-h">
+  <div class="section-head">
+    <h2 id="latest-h">Latest publications</h2>
+    <a class="section-link" href="/research/">All publications {{ icon("arrow", 16) }}</a>
+  </div>
+  <div class="pub-grid">
+    {% for p in collections.publications | limit(3) %}{{ pubCard(p) }}{% endfor %}
+  </div>
+</section>
+
+<section class="section wrap" aria-labelledby="tools-h">
+  <div class="section-head">
+    <h2 id="tools-h">Tools for the community</h2>
+    <a class="section-link" href="/tools/">All tools {{ icon("arrow", 16) }}</a>
+  </div>
+  <div class="tool-grid">
+    {% for t in tools %}{{ toolCard(t) }}{% endfor %}
+  </div>
+</section>
+
+<section class="section wrap journey" aria-labelledby="journey-h">
+  <div class="section-head">
+    <h2 id="journey-h">The path so far</h2>
+  </div>
+  <ol class="trail">
+    {% for j in journey %}
+    <li class="trail-stop trail-{{ j.kind }}">
+      <span class="trail-dot" aria-hidden="true"></span>
+      <span class="trail-when">{{ j.when }}</span>
+      <h3>{{ j.what }}</h3>
+      <p class="trail-where">{{ j.where }}</p>
+      <p>{{ j.note }}</p>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+
+<section id="contact" class="section wrap" aria-labelledby="contact-h">
+  <div class="contact-card">
+    <div>
+      <h2 id="contact-h">Say hello</h2>
+      <p>I'm always happy to talk about plant stress, comparative genomics, collaborations or teaching.</p>
+    </div>
+    <div class="contact-links">
+      <a class="btn btn-primary" href="mailto:{{ site.email }}">{{ icon("mail", 18) }} Email me</a>
+      <a class="btn btn-ghost" href="{{ site.orcid }}" rel="me">{{ icon("orcid", 18) }} ORCID</a>
+      <a class="btn btn-ghost" href="{{ site.linkedin }}" rel="me">{{ icon("linkedin", 18) }} LinkedIn</a>
+    </div>
+  </div>
+</section>

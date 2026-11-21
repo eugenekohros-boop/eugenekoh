@@ -1,0 +1,20 @@
+---
+layout: layouts/base.njk
+title: "Page not found"
+permalink: /404.html
+eleventyExcludeFromCollections: true
+---
+{% from "partials/scenes.njk" import scene %}
+{% from "partials/icons.njk" import icon %}
+
+<div class="hero-scene hero-scene--page hero-scene--short">
+  {{ scene("dusk", "lost") }}
+</div>
+<div class="wrap wrap-narrow">
+  <header class="page-head card center">
+    <p class="eyebrow">404</p>
+    <h1>You've wandered off the path</h1>
+    <p class="lede">This page doesn't exist, or it has moved somewhere new.</p>
+    <p><a class="btn btn-primary" href="/">{{ icon("back", 16) }} Back home</a></p>
+  </header>
+</div>

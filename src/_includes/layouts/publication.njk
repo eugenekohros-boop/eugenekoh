@@ -1,0 +1,95 @@
+---
+layout: layouts/base.njk
+---
+{% from "partials/scenes.njk" import scene %}
+{% from "partials/icons.njk" import icon %}
+{% from "partials/cards.njk" import pubCard %}
+{% set threadInfo = threads | where("key", thread) | first %}
+{% set citeData = { title: title, authors: authors, journal: journal, date: page.date, cite_year: cite_year, volume: volume, issue: issue, pages: pages, doi: doi, preprint_only: preprint_only } %}
+
+<article class="pub t-{{ thread }}">
+  <div class="hero-scene hero-scene--page">
+    {% if image %}
+      <img src="{{ image }}" alt="{{ image_alt or '' }}">
+    {% else %}
+      {{ scene(art, "pub", label=art_label) }}
+    {% endif %}
+  </div>
+
+  <div class="wrap wrap-narrow">
+    <header class="pub-head card">
+      <a class="crumb" href="/research/">{{ icon("back", 16) }} All research</a>
+      <p class="eyebrow"><span class="eyebrow-icon">{{ icon(threadInfo.icon, 18) }}</span> {{ threadInfo.name }}</p>
+      <h1>{{ plain_title }}</h1>
+      <p class="pub-formal">{{ title }}</p>
+      <dl class="pub-facts">
+        <div><dt>Published in</dt><dd><em>{{ journal }}</em> · {{ page.date | year }}{% if status %} · {{ status }}{% endif %}</dd></div>
+        <div><dt>My role</dt><dd>{{ role }}</dd></div>
+        <div class="pub-facts-wide"><dt>Authors</dt><dd class="authors">{{ authors | highlightMe | safe }}</dd></div>
+      </dl>
+      {% if author_note %}<p class="fine">{{ author_note }}</p>{% endif %}
+      <div class="pub-actions">
+        {% if doi %}<a class="btn btn-primary" href="https://doi.org/{{ doi }}" target="_blank" rel="noopener">Read the paper {{ icon("external", 16) }}</a>{% endif %}
+        {% if pmc %}<a class="btn btn-ghost" href="https://pmc.ncbi.nlm.nih.gov/articles/{{ pmc }}/" target="_blank" rel="noopener">Free full text</a>{% endif %}
+        {% if pubmed %}<a class="btn btn-ghost" href="https://pubmed.ncbi.nlm.nih.gov/{{ pubmed }}/" target="_blank" rel="noopener">PubMed</a>{% endif %}
+        {% for l in links %}<a class="btn btn-ghost" href="{{ l.url }}"{% if l.url.startsWith('http') %} target="_blank" rel="noopener"{% endif %}>{{ l.label }}</a>{% endfor %}
+      </div>
+    </header>
+
+    <section class="nutshell" aria-labelledby="nutshell-h">
+      <h2 id="nutshell-h"><span class="nutshell-icon">{{ icon("leaf", 20) }}</span> In a nutshell</h2>
+      <p>{{ nutshell }}</p>
+    </section>
+
+    {% if stats %}
+    <ul class="stats" aria-label="Key numbers">
+      {% for s in stats %}<li><strong>{{ s.value }}</strong><span>{{ s.label }}</span></li>{% endfor %}
+    </ul>
+    {% endif %}
+
+    <div class="prose">
+      {{ content | safe }}
+    </div>
+
+    {% if glossary %}
+    <section class="glossary" aria-labelledby="glossary-h">
+      <h2 id="glossary-h">Words worth knowing</h2>
+      <dl>
+        {% for g in glossary %}<div><dt>{{ g.term }}</dt><dd>{{ g.def }}</dd></div>{% endfor %}
+      </dl>
+    </section>
+    {% endif %}
+
+    <section class="cite" aria-labelledby="cite-h">
+      <h2 id="cite-h">Cite this paper</h2>
+      <div class="cite-box">
+        <p id="cite-apa">{{ citeData | apa }}</p>
+        <button class="btn btn-small" type="button" data-copy="#cite-apa">{{ icon("copy", 16) }} <span>Copy</span></button>
+      </div>
+      <details class="bibtex">
+        <summary>BibTeX</summary>
+        <div class="cite-box">
+          <pre id="cite-bib">{{ citeData | bibtex }}</pre>
+          <button class="btn btn-small" type="button" data-copy="#cite-bib">{{ icon("copy", 16) }} <span>Copy</span></button>
+        </div>
+      </details>
+    </section>
+  </div>
+
+  {% set rel = collections.publications | related(page.url, thread) %}
+  {% if rel.length %}
+  <section class="related wrap" aria-labelledby="related-h">
+    <h2 id="related-h">More from this thread</h2>
+    <div class="pub-grid">
+      {% for p in rel %}{{ pubCard(p) }}{% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% set newer = collections.publications | getPreviousCollectionItem(page) %}
+  {% set older = collections.publications | getNextCollectionItem(page) %}
+  <nav class="pager wrap" aria-label="More publications">
+    {% if older %}<a class="pager-link" href="{{ older.url }}"><span>{{ icon("back", 16) }} Older</span>{{ older.data.plain_title }}</a>{% else %}<span></span>{% endif %}
+    {% if newer %}<a class="pager-link pager-next" href="{{ newer.url }}"><span>Newer {{ icon("arrow", 16) }}</span>{{ newer.data.plain_title }}</a>{% endif %}
+  </nav>
+</article>

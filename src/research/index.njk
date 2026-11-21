@@ -1,0 +1,53 @@
+---
+layout: layouts/base.njk
+title: Research
+description: "Plain-language explainers for each of Eugene Koh's publications on plant stress, singlet oxygen and plant-kingdom transcriptomics."
+---
+{% from "partials/scenes.njk" import scene %}
+{% from "partials/icons.njk" import icon %}
+{% from "partials/cards.njk" import pubCard %}
+
+<div class="hero-scene hero-scene--page hero-scene--short">
+  {{ scene("evolution", "research", label="A dotted trail running from a pond of algae past mosses, ferns and conifers to a flowering tree") }}
+</div>
+
+<div class="wrap">
+  <header class="page-head card">
+    <p class="eyebrow"><span class="eyebrow-icon">{{ icon("book", 18) }}</span> Research</p>
+    <h1>Publications, explained</h1>
+    <p class="lede">Each paper has its own page telling its story in plain language: the question, what we did, what we found and why it matters. Choose a thread, or browse them all.</p>
+  </header>
+
+  <div class="filters" role="group" aria-label="Filter by research thread">
+    <button class="chip is-active" type="button" data-filter="all" aria-pressed="true">All</button>
+    {% for t in threads %}
+    <button class="chip t-{{ t.key }}" type="button" data-filter="{{ t.key }}" aria-pressed="false">{{ icon(t.icon, 16) }} {{ t.short }}</button>
+    {% endfor %}
+  </div>
+  {% for t in threads %}
+  <p class="thread-blurb t-{{ t.key }}" data-blurb="{{ t.key }}" hidden>{{ t.blurb }}</p>
+  {% endfor %}
+
+  <div class="pub-years">
+    <h2 class="visually-hidden">Publications, newest first</h2>
+    <div class="pub-grid">
+      {% for p in collections.publications %}{{ pubCard(p) }}{% endfor %}
+    </div>
+  </div>
+
+  <section class="other-pubs" aria-labelledby="other-h">
+    <h2 id="other-h">Other collaborations</h2>
+    <p>Beyond plant biology, I've contributed to collaborative studies in neuroscience, integrative medicine and bacterial genetics.</p>
+    <ul class="other-list">
+      {% for o in otherPublications %}
+      <li>
+        <span class="other-year">{{ o.year }}</span>
+        <div>
+          <a href="https://doi.org/{{ o.doi }}" target="_blank" rel="noopener">{{ o.title }}</a>
+          <p class="other-meta"><em>{{ o.journal }}</em> · {{ o.authors | highlightMe | safe }}</p>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
