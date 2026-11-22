@@ -75,7 +75,9 @@ Before each push, `git status` lists the files that will be uploaded.
 ### Custom domain (for example `eugenekoh.com`)
 
 1. **Buy the domain** from a registrar such as Porkbun, Cloudflare or Namecheap. A `.com` costs about
-   US$10–15 a year. Make sure WHOIS privacy is on (usually free), so your contact details stay hidden.
+   US$10–15 a year; check the *renewal* price, not just the first-year offer. Make sure WHOIS privacy is
+   on (usually free), so your contact details stay hidden. Turn on **auto-renew** and two-factor sign-in:
+   if a domain lapses, someone else can buy it and put anything on your old address.
 2. **Verify it on GitHub:** your profile picture → **Settings → Pages → Add a domain**. GitHub shows
    a `TXT` record. Add it in the registrar's DNS settings, then click **Verify**.
 3. **Point the domain at GitHub** in the registrar's DNS settings:
@@ -92,8 +94,11 @@ Before each push, `git status` lists the files that will be uploaded.
    to **DNS only** (grey cloud).
 4. **Tell GitHub:** the repository → **Settings → Pages → Custom domain** → enter `eugenekoh.com` → **Save**.
    Once the DNS check passes, tick **Enforce HTTPS**. The certificate can take up to a day.
-5. Set `url: "https://eugenekoh.com"` in `src/_data/site.js` and push. The build works out the right
-   paths by itself, so nothing else needs changing.
+   No `CNAME` file is needed, because the site is published by GitHub Actions.
+5. **After step 4**, set `url: "https://eugenekoh.com"` in `src/_data/site.js` and push. That push rebuilds
+   the site for the new address. Until it finishes, pages on the new domain may look unstyled or have
+   broken links, because they were built for `/<repo>/`. If you don't push, the same rebuild is under
+   **Actions → Deploy site → Run workflow**. The old `github.io` address redirects to the new domain by itself.
 
 ## Notes
 
